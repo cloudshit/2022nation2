@@ -1,9 +1,0 @@
-version: 0.0
-Resources:
-  - TargetService:
-      Type: AWS::ECS::Service
-      Properties:
-        TaskDefinition: "arn:aws:ecs:ap-northeast-2:790946953677:task-definition/skills-td"
-        LoadBalancerInfo: 
-          ContainerName: "app" 
-          ContainerPort: 80
