@@ -19,7 +19,7 @@
           "healthCheck": {
               "command": [
                   "CMD-SHELL",
-                  "curl http://localhost:80/health || exit 1"
+                  "[ $(curl -I http://localhost:80/health -o /dev/null -w '%%{http_code}\\n' -s) == \"200\" ] || exit 1"
               ],
               "interval": 5,
               "timeout": 2,

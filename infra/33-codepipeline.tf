@@ -21,7 +21,7 @@ resource "aws_codepipeline" "codepipeline" {
       configuration = {
         RepositoryName = aws_codecommit_repository.code.repository_name
         BranchName = "upstream"
-        PollForSourceChanges = "true"
+        PollForSourceChanges = "false"
         OutputArtifactFormat = "CODE_ZIP"
       }
     }
@@ -114,4 +114,71 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
   name   = "codepipeline_policy"
   role   = aws_iam_role.codepipeline_role.id
   policy = data.aws_iam_policy_document.codepipeline_policy.json
+}
+
+resource "aws_cloudwatch_event_rule" "event" {
+  name = "skills-ci-event"
+
+  event_pattern = <<EOF
+{
+  "source": [ "aws.codecommit" ],
+  "detail-type": [ "CodeCommit Repository State Change" ],
+  "resources": [ "${aws_codecommit_repository.code.arn}" ],
+  "detail": {
+     "event": [
+       "referenceCreated",
+       "referenceUpdated"
+      ],
+     "referenceType":["branch"],
+     "referenceName": ["upstream"]
+  }
+}
+EOF
+}
+
+resource "aws_cloudwatch_event_target" "event" {
+  target_id = "skills-ci-event-target"
+  rule = aws_cloudwatch_event_rule.event.name
+  arn = aws_codepipeline.codepipeline.arn
+  role_arn = aws_iam_role.ci.arn
+}
+
+resource "aws_iam_role" "ci" {
+  name = "skills-ci"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "events.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+data "aws_iam_policy_document" "ci" {
+  statement {
+    actions = [
+      "iam:PassRole",
+      "codepipeline:*"
+    ]
+
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "ci" {
+  name = "skills-ci-policy"
+  policy = data.aws_iam_policy_document.ci.json
+}
+
+resource "aws_iam_role_policy_attachment" "ci" {
+  policy_arn = aws_iam_policy.ci.arn
+  role = aws_iam_role.ci.name
 }

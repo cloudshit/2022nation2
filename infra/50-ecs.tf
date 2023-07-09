@@ -40,7 +40,7 @@ resource "aws_ecs_task_definition" "td" {
       }
     ],
     "healthCheck": {
-      "command": ["CMD-SHELL", "curl http://localhost:80/health || exit 1"],
+      "command": ["CMD-SHELL", "[ $(curl -I http://localhost:80/health -o /dev/null -w '%%{http_code}\\n' -s) == \"200\" ] || exit 1"],
       "interval": 5,
       "timeout": 2,
       "retries": 1,
@@ -97,6 +97,12 @@ resource "aws_ecs_service" "svc" {
   placement_constraints {
     type       = "memberOf"
     expression = "attribute:ecs.availability-zone in [ap-notheast-2a, ap-northeast-2b, ap-northeast-2c]"
+  }
+
+  capacity_provider_strategy {
+    base = 1
+    capacity_provider = aws_ecs_capacity_provider.capacity.name
+    weight = 100
   }
 
   lifecycle {

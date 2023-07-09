@@ -51,5 +51,5 @@ resource "aws_lambda_function" "hook" {
 
   source_code_hash = data.archive_file.hook.output_base64sha256
 
-  runtime = "nodejs18.x"
+  runtime = "nodejs16.x"
 }

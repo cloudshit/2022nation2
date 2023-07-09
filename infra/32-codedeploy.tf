@@ -26,7 +26,8 @@ data "aws_iam_policy_document" "deploy" {
       "ecr:*",
       "ecs:*",
       "elasticloadbalancing:*",
-      "ec2:*"
+      "ec2:*",
+      "lambda:*"
     ]
 
     resources = ["*"]
@@ -57,13 +58,12 @@ resource "aws_codedeploy_deployment_group" "dg" {
 
   blue_green_deployment_config {
     deployment_ready_option {
-      action_on_timeout = "STOP_DEPLOYMENT"
-      wait_time_in_minutes = 1
+      action_on_timeout = "CONTINUE_DEPLOYMENT"
     }
 
     terminate_blue_instances_on_deployment_success {
       action                           = "TERMINATE"
-      termination_wait_time_in_minutes = 1
+      termination_wait_time_in_minutes = 0
     }
   }
 
