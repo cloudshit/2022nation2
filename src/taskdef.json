@@ -1,0 +1,42 @@
+{
+  "containerDefinitions": [
+      {
+          "name": "app",
+          "image": "<IMAGE1_NAME>",
+          "cpu": 512,
+          "memory": 1024,
+          "portMappings": [
+              {
+                  "containerPort": 80,
+                  "hostPort": 80,
+                  "protocol": "tcp"
+              }
+          ],
+          "essential": true,
+          "environment": [],
+          "mountPoints": [],
+          "volumesFrom": [],
+          "healthCheck": {
+              "command": [
+                  "CMD-SHELL",
+                  "curl http://localhost:80/health || exit 1"
+              ],
+              "interval": 5,
+              "timeout": 2,
+              "retries": 1,
+              "startPeriod": 0
+          }
+      }
+  ],
+  "family": "skills-td",
+  "networkMode": "awsvpc",
+  "placementConstraints": [],
+  "compatibilities": [
+      "EC2"
+  ],
+  "requiresCompatibilities": [
+      "EC2"
+  ],
+  "cpu": "512",
+  "memory": "1024"
+}
