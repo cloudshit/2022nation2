@@ -45,14 +45,11 @@ exports.handler = (event, context, callback) => {
       }
     
       // Pass CodeDeploy the prepared validation test results.
-      codedeploy.putLifecycleEventHookExecutionStatus(params, function(err, data) {
-        if (err) {
-          // Validation failed.
+      codedeploy.putLifecycleEventHookExecutionStatus(params, function() {
+        if (validationTestResult === "Failed") {
           console.log('validation tests failed')
-          console.log(err, err.stack)
-          callback("CodeDeploy Status update failed")
+          callback("validation tests failed")
         } else {
-          // Validation succeeded.
           console.log("validation tests succeeded")
           callback(null, "validation tests succeeded")
         }

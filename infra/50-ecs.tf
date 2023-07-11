@@ -40,7 +40,10 @@ resource "aws_ecs_task_definition" "td" {
       }
     ],
     "healthCheck": {
-      "command": ["CMD-SHELL", "[ $(curl -I http://localhost:80/health -o /dev/null -w '%%{http_code}\\n' -s) == \"200\" ] || exit 1"],
+      "command": [
+        "CMD-SHELL",
+        "curl -fLs http://localhost:80/health > /dev/null || exit 1"
+      ],
       "interval": 5,
       "timeout": 2,
       "retries": 1,
@@ -106,7 +109,7 @@ resource "aws_ecs_service" "svc" {
   }
 
   lifecycle {
-    ignore_changes = [desired_count, task_definition]
+    ignore_changes = [desired_count, task_definition, capacity_provider_strategy]
   }
 }
 

@@ -39,7 +39,6 @@ resource "aws_iam_role_policy" "deploy" {
   policy = data.aws_iam_policy_document.deploy.json
 }
 
-
 resource "aws_codedeploy_app" "app" {
   compute_platform = "ECS"
   name             = "skills-app"
